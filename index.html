@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevFlow Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="gradient-bg min-h-screen text-white font-sans">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="flex justify-between items-center mb-8">
+            <div>
+                <h1 class="text-3xl font-bold">DevFlow Dashboard</h1>
+                <p class="text-blue-200">Your productivity companion</p>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div id="current-time" class="text-xl font-mono"></div>
+                <button id="theme-toggle" class="p-2 rounded-full hover:bg-white/10">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Column -->
+            <div class="space-y-6">
+                <!-- GitHub Activity -->
+                <div class="glass-card rounded-xl p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold flex items-center">
+                            <i class="fab fa-github mr-2"></i> GitHub Activity
+                        </h2>
+                        <div class="flex space-x-2">
+                            <button id="refresh-github" class="p-1 hover:text-blue-300">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <input type="text" id="github-username" placeholder="username" 
+                                   class="bg-white/10 rounded px-2 py-1 text-sm w-24 focus:outline-none focus:ring-1 focus:ring-blue-300">
+                        </div>
+                    </div>
+                    <div id="github-stats" class="grid grid-cols-3 gap-2 mb-4">
+                        <div class="text-center">
+                            <div class="text-2xl font-bold" id="repo-count">--</div>
+                            <div class="text-xs text-blue-200">Repos</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold" id="star-count">--</div>
+                            <div class="text-xs text-blue-200">Stars</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="text-2xl font-bold" id="fork-count">--</div>
+                            <div class="text-xs text-blue-200">Forks</div>
+                        </div>
+                    </div>
+                    <canvas id="github-chart" height="150"></canvas>
+                </div>
+
+                <!-- Weather Widget -->
+                <div class="glass-card rounded-xl p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold flex items-center">
+                            <i class="fas fa-cloud-sun mr-2"></i> Weather
+                        </h2>
+                        <div class="flex space-x-2">
+                            <input type="text" id="weather-location" placeholder="Location" 
+                                   class="bg-white/10 rounded px-2 py-1 text-sm w-32 focus:outline-none focus:ring-1 focus:ring-blue-300">
+                            <button id="refresh-weather" class="p-1 hover:text-blue-300">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="weather-content" class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <div id="weather-icon" class="weather-icon text-5xl mr-4">
+                                <i class="fas fa-spinner fa-spin"></i>
+                            </div>
+                            <div>
+                                <div id="weather-temp" class="text-4xl font-bold">--°</div>
+                                <div id="weather-desc" class="text-sm text-blue-200">Loading...</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div id="weather-location-name" class="font-medium">--</div>
+                            <div id="weather-details" class="text-xs text-blue-200 mt-1">
+                                Humidity: --%<br>
+                                Wind: -- km/h
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Middle Column -->
+            <div class="space-y-6">
+                <!-- Pomodoro Timer -->
+                <div class="glass-card rounded-xl p-6">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="fas fa-clock mr-2"></i> Pomodoro Timer
+                    </h2>
+                    <div class="flex justify-center mb-6">
+                        <div id="pomodoro-timer" class="rounded-full border-4 border-white/30 w-48 h-48 flex items-center justify-center text-4xl font-mono transition-all">
+                            25:00
+                        </div>
+                    </div>
+                    <div class="flex justify-center space-x-4">
+                        <button id="pomodoro-start" class="bg-red-500 hover:bg-red-600 px-6 py-2 rounded-full font-medium">
+                            Start
+                        </button>
+                        <button id="pomodoro-reset" class="bg-white/10 hover:bg-white/20 px-6 py-2 rounded-full font-medium">
+                            Reset
+                        </button>
+                    </div>
+                    <div class="mt-6">
+                        <div class="flex justify-between text-sm mb-2">
+                            <span>Work: <span id="work-count">0</span></span>
+                            <span>Break: <span id="break-count">0</span></span>
+                        </div>
+                        <div class="bg-white/10 h-2 rounded-full">
+                            <div id="pomodoro-progress" class="bg-red-500 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Timezone Tracker -->
+                <div class="glass-card rounded-xl p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold flex items-center">
+                            <i class="fas fa-globe mr-2"></i> Timezones
+                        </h2>
+                        <div class="flex space-x-2">
+                            <select id="timezone-select" class="bg-white/10 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-300">
+                                <option value="America/New_York">New York</option>
+                                <option value="Europe/London">London</option>
+                                <option value="Asia/Tokyo">Tokyo</option>
+                                <option value="Australia/Sydney">Sydney</option>
+                            </select>
+                            <button id="add-timezone" class="p-1 hover:text-blue-300">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="timezone-list" class="space-y-3">
+                        <!-- Timezone items will be added here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="space-y-6">
+                <!-- To-Do List -->
+                <div class="glass-card rounded-xl p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h2 class="text-xl font-semibold flex items-center">
+                            <i class="fas fa-tasks mr-2"></i> To-Do List
+                        </h2>
+                        <button id="clear-completed" class="text-sm hover:text-blue-300">
+                            Clear completed
+                        </button>
+                    </div>
+                    <div class="flex mb-4">
+                        <input type="text" id="todo-input" placeholder="Add a new task..." 
+                               class="flex-grow bg-white/10 rounded-l px-4 py-2 focus:outline-none focus:ring-1 focus:ring-blue-300">
+                        <button id="add-todo" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-r">
+                            Add
+                        </button>
+                    </div>
+                    <div id="todo-list" class="space-y-2 max-h-96 overflow-y-auto">
+                        <!-- To-do items will be added here -->
+                    </div>
+                </div>
+
+                <!-- Quick Notes -->
+                <div class="glass-card rounded-xl p-6">
+                    <h2 class="text-xl font-semibold mb-4 flex items-center">
+                        <i class="fas fa-sticky-note mr-2"></i> Quick Notes
+                    </h2>
+                    <textarea id="quick-notes" class="w-full bg-white/10 rounded p-4 h-40 focus:outline-none focus:ring-1 focus:ring-blue-300" 
+                              placeholder="Jot down quick notes..."></textarea>
+                    <div class="flex justify-end mt-2">
+                        <button id="save-notes" class="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded text-sm">
+                            Save Notes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+.gradient-bg {
+    background: linear-gradient(135deg, #1e3a8a 0%, #0ea5e9 100%);
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.pomodoro-active {
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.7);
+}
+
+.task-completed {
+    text-decoration: line-through;
+    opacity: 0.7;
+}
+
+.weather-icon {
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
+}
+
+/* Additional styles can be added here */
